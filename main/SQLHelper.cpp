@@ -2689,12 +2689,28 @@ unsigned long long CSQLHelper::UpdateValueInt(const int HardwareID, const char* 
 		//Add Lighting log
 		m_LastSwitchID=ID;
 		m_LastSwitchRowID=ulID;
-		result = safe_query(
-			"INSERT INTO LightingLog (DeviceRowID, nValue, sValue) "
-			"VALUES ('%llu', '%d', '%q')",
-			ulID,
-			nValue,sValue);
 
+		bool bAdd2LightingLog = true;
+
+		result = safe_query(
+				    "SELECT nValue FROM LightingLog WHERE (DeviceRowID = %llu) "
+				    "ORDER BY Date DESC LIMIT 1",
+				    ulID);
+		if (result.size()>0)
+		{
+			std::vector<std::string> sd=result[0];
+			int nOldValue = (int)atof(sd[0].c_str());
+			bAdd2LightingLog = (nOldValue != nValue);
+		}
+
+		if( bAdd2LightingLog )
+		{
+			result = safe_query(
+					    "INSERT INTO LightingLog (DeviceRowID, nValue, sValue) "
+					    "VALUES ('%llu', '%d', '%q')",
+					    ulID,
+					    nValue,sValue);
+		}
 		std::string lstatus="";
 		int llevel=0;
 		bool bHaveDimmer=false;
