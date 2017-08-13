@@ -3577,11 +3577,26 @@ uint64_t CSQLHelper::UpdateValueInt(const int HardwareID, const char* ID, const 
 		//Add Lighting log
 		m_LastSwitchID=ID;
 		m_LastSwitchRowID=ulID;
+		bool bAdd2LightingLog = true;
 		result = safe_query(
-			"INSERT INTO LightingLog (DeviceRowID, nValue, sValue) "
-			"VALUES ('%" PRIu64 "', '%d', '%q')",
-			ulID,
-			nValue,sValue);
+				    "SELECT nValue, sValue FROM LightingLog WHERE (DeviceRowID = '%" PRIu64 "') "
+				    "ORDER BY Date DESC LIMIT 1",
+				    ulID);
+		if (result.size()>0)
+		{
+			std::vector<std::string> sd=result[0];
+			int nOldValue = (int)atof(sd[0].c_str());
+			bAdd2LightingLog = (nOldValue != nValue || strcmp(sd[1].c_str(), sValue));
+		}
+		
+		if( bAdd2LightingLog )
+		{
+			result = safe_query(
+					    "INSERT INTO LightingLog (DeviceRowID, nValue, sValue) "
+					    "VALUES ('%" PRIu64 "', '%d', '%q')",
+					    ulID,
+					    nValue,sValue);
+		}
 
 		if (!bDeviceUsed)
 			return ulID;	//don't process further as the device is not used
