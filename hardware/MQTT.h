@@ -14,7 +14,7 @@
 class MQTT : public MySensorsBase, mosqpp::mosquittopp
 {
 public:
-	MQTT(const int ID, const std::string &IPAddress, const unsigned short usIPPort, const std::string &Username, const std::string &Password, const std::string &CAFile, const int Topics);
+	MQTT(const int ID, const std::string &Name, const std::string &IPAddress, const unsigned short usIPPort, const std::string &Username, const std::string &Password, const std::string &CAFile, const int Topics);
 	~MQTT(void);
 	bool isConnected(){ return m_IsConnected; };
 
@@ -36,6 +36,7 @@ private:
 	void SendDeviceInfo(const int m_HwdID, const uint64_t DeviceRowIdx, const std::string &DeviceName, const unsigned char *pRXCommand);
 	void SendSceneInfo(const uint64_t SceneIdx, const std::string &SceneName);
 protected:
+	std::string m_szName;
 	std::string m_szIPAddress;
 	unsigned short m_usIPPort;
 	std::string m_UserName;

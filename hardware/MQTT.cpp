@@ -18,7 +18,8 @@
 #define TOPIC_IN	"domoticz/in"
 #define QOS         1
 
-MQTT::MQTT(const int ID, const std::string &IPAddress, const unsigned short usIPPort, const std::string &Username, const std::string &Password, const std::string &CAfilename, const int Topics) :
+MQTT::MQTT(const int ID, const std::string &Name, const std::string &IPAddress, const unsigned short usIPPort, const std::string &Username, const std::string &Password, const std::string &CAfilename, const int Topics) :
+m_szName(Name),
 m_szIPAddress(IPAddress),
 m_UserName(Username),
 m_Password(Password),
@@ -31,8 +32,9 @@ m_CAFilename(CAfilename)
 
 	m_usIPPort=usIPPort;
 	m_publish_topics = (_ePublishTopics)Topics;
-	m_TopicIn = TOPIC_IN;
-	m_TopicOut = TOPIC_OUT;
+
+	m_TopicIn = m_szName + "/" + TOPIC_IN;
+	m_TopicOut = m_szName + "/" + TOPIC_OUT;
 }
 
 MQTT::~MQTT(void)
@@ -678,7 +680,7 @@ void MQTT::SendDeviceInfo(const int m_HwdID, const uint64_t DeviceRowIdx, const 
 		std::string message =  root.toStyledString();
 		if (m_publish_topics & PT_out)
 		{
-			SendMessage(TOPIC_OUT, message);
+			SendMessage(m_TopicOut, message);
 		}
 
 		if (m_publish_topics & PT_floor_room) {
@@ -689,7 +691,7 @@ void MQTT::SendDeviceInfo(const int m_HwdID, const uint64_t DeviceRowIdx, const 
 				std::string floor = sd[0];
 				std::string room =  sd[1];
 				std::stringstream topic;
-				topic << TOPIC_OUT << "/" << floor << "/" + room;
+				topic << m_TopicOut << "/" << floor << "/" + room;
 
 				SendMessage(topic.str() , message);
 			}
@@ -755,6 +757,6 @@ void MQTT::SendSceneInfo(const uint64_t SceneIdx, const std::string &SceneName)
 	std::string message = root.toStyledString();
 	if (m_publish_topics & PT_out)
 	{
-		SendMessage(TOPIC_OUT, message);
+		SendMessage(m_TopicOut, message);
 	}
 }
