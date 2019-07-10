@@ -335,14 +335,16 @@ void CWunderground::GetMeterDetails()
 	{
 		if ((root["metric"]["windSpeed"] != "N/A") && (root["metric"]["windSpeed"] != "--"))
 		{
-			windspeed_ms = static_cast<float>(atof(root["metric"]["windSpeed"].asString().c_str()));
+			float windspeed_kmh = static_cast<float>(atof(root["metric"]["windSpeed"].asString().c_str()));
+			windspeed_ms = windspeed_kmh * 1000 / (60*60);
 		}
 	}
 	if (root["metric"]["windGust"].empty()==false)
 	{
 		if ((root["metric"]["windGust"] != "N/A") && (root["metric"]["windGust"] != "--"))
 		{
-			windgust_ms = static_cast<float>(atof(root["metric"]["windGust"].asString().c_str()));
+			float windgust_kmh = static_cast<float>(atof(root["metric"]["windGust"].asString().c_str()));
+			windgust_ms = windgust_kmh * 1000 / (60*60);
 		}
 	}
 	if (root["metric"]["windChill"].empty()==false)
